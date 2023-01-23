@@ -135,9 +135,14 @@ const runOutputChangedMicroservices = (filesStr) => {
   try {
     files = JSON.parse(filesStr || '[]');
   } catch (e) {
-    console.log(`Failed to parse json input: ${chalk.red(filesStr)}`);
+    try {
+      // try to remove escape slashes
+      files = JSON.parse(filesStr.replace(/\\/g,""));
+    } catch (e2) {
+      console.log(`Failed to parse json input: ${filesStr}`);
 
-    return github.setFailed(`Action failed with error ${e}`);
+      return github.setFailed(`Action failed with error ${e}, ${e2}`);
+    }
   }
 
   if (!files.length) {
@@ -148,7 +153,7 @@ const runOutputChangedMicroservices = (filesStr) => {
 
   const changedMs = new Set();
 
-  files.forEach((file) => {
+  [...new Set(files)].forEach((file) => {
     if (!file.startsWith('microservices')) {
       return;
     }
