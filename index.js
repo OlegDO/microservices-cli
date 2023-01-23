@@ -463,7 +463,7 @@ const runCreateMicroservice = async (name, isStaging, withDb) => {
   replaceStrInFile('microservice-name', name, `${msPath}/README.md`);
 
   if (withDb) {
-    runChangeFeature('db', 'add', isStaging);
+    await runChangeFeature('db', 'add', isStaging);
   }
 
   fse.removeSync(tempPath);
@@ -639,6 +639,72 @@ const runInitProject = async (name, isStaging) => {
   console.info(chalk.green('Done!'));
 }
 
+/**
+ * Working with authorization permissions
+ */
+const runAuthorizationPermissions = async (act, isProd) => {
+  let promptAction = '';
+
+  if (!act) {
+    const prompt = await inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'action',
+          message: 'Please choose feature: ',
+          choices: ['export', 'sync'],
+        },
+      ]);
+
+    promptAction = prompt.action;
+  }
+
+  const action = act || promptAction;
+  let npmCommand;
+
+  switch (action) {
+    case 'export':
+      npmCommand = `permissions:export:${isProd ? 'prod' : 'dev'}`
+      break;
+
+    case 'sync':
+      npmCommand = 'permissions:sync'
+      break;
+
+    default:
+      console.log(chalk.red(`Unrecognized action: ${action}`));
+      return;
+  }
+
+  console.log(chalk.yellow('Detect microservice running type...'));
+
+  let containerId;
+
+  try {
+    containerId = String(childProcess.execSync('docker ps -aqf "name=authorization"')).trim();
+
+    if (containerId) {
+      console.log(`Seems like microservice running type is: ${chalk.green('docker')}. Container ID: ${chalk.yellow(containerId)}`);
+
+      childProcess.execSync(`docker exec ${containerId} npm run ${npmCommand}`, { stdio: 'inherit' });
+
+      return;
+    }
+  } catch (e) {
+    if (!e.message.includes('Cannot connect to the Docker')) {
+      console.log(`Docker error: ${e}`);
+    }
+
+    if (containerId) {
+      return;
+    }
+  }
+
+  console.log(`Seems like microservice running type is: ${chalk.green('node')}.`);
+
+  childProcess.execSync(`cd ${getMsFolder()}/authorization && npm run ${npmCommand}`, { stdio: 'inherit' });
+}
+
 program
   .name(packageJson.name)
   .description(packageJson.description)
@@ -738,7 +804,7 @@ program.command('feature')
   .addArgument(new Argument('<action>', 'action name').choices(['add', 'remove']))
   .option('--staging', 'use staging configuration', false)
   .action((name, action, { staging }) => {
-    runChangeFeature(name, action, staging);
+    void runChangeFeature(name, action, staging);
   });
 
 program.command('extend')
@@ -762,6 +828,14 @@ program.command('package-version')
   .addOption(new Option('--dir [dir]', 'working directory').env('WORK_DIR'))
   .action(({ dir }) => {
     void runOutputPackageVersion(dir);
+  });
+
+program.command('permissions')
+  .description('Working with permissions in authorization microservice')
+  .addArgument(new Argument('[action]', 'permissions action. export - dump from DB to files, sync - get microservices meta and update in schema DB').choices(['export', 'sync']))
+  .option('--is-prod', 'run command in production', false)
+  .action((action, { isProd }) => {
+    void runAuthorizationPermissions(action, isProd);
   });
 
 program.command('init')
