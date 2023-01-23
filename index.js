@@ -664,11 +664,11 @@ const runAuthorizationPermissions = async (act, isProd) => {
 
   switch (action) {
     case 'export':
-      npmCommand = `permissions:export:${isProd ? 'prod' : 'dev'}`
+      npmCommand = `permissions:export:${isProd ? 'prod' : 'dev'}`;
       break;
 
     case 'sync':
-      npmCommand = 'permissions:sync'
+      npmCommand = `permissions:sync:${isProd ? 'prod' : 'dev'}`;
       break;
 
     default:
