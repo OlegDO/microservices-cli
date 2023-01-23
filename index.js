@@ -165,12 +165,12 @@ const runOutputChangedMicroservices = (filesStr) => {
     }
   });
 
-  const output1 = `[${[...changedMs].join(',')}]`;
+  const output1 = `["${[...changedMs].join('","')}"]`;
   const output2 = [...changedMs].join(' ');
 
   console.log(`Changed microservices: ${chalk.green(output1)}`);
 
-  // output example: "[demo1,demo2,demo3]"
+  // output example: ["demo1","demo2","demo3"]
   github.setOutput('list', output1);
   // output example: "demo1 demo2 demo3"
   github.setOutput('list-spaced', output2);
