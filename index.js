@@ -664,11 +664,11 @@ const runAuthorizationPermissions = async (act, isProd) => {
 
   switch (action) {
     case 'export':
-      npmCommand = `permissions:export:${isProd ? 'prod' : 'dev'}`;
+      npmCommand = 'permissions:export';
       break;
 
     case 'sync':
-      npmCommand = `permissions:sync:${isProd ? 'prod' : 'dev'}`;
+      npmCommand = 'permissions:sync';
       break;
 
     default:
@@ -686,7 +686,7 @@ const runAuthorizationPermissions = async (act, isProd) => {
     if (containerId) {
       console.log(`Seems like microservice running type is: ${chalk.green('docker')}. Container ID: ${chalk.yellow(containerId)}`);
 
-      childProcess.execSync(`docker exec ${containerId} npm run ${npmCommand}`, { stdio: 'inherit' });
+      childProcess.execSync(`docker exec ${containerId} npm run ${npmCommand}:prod`, { stdio: 'inherit' });
 
       return;
     }
@@ -702,7 +702,7 @@ const runAuthorizationPermissions = async (act, isProd) => {
 
   console.log(`Seems like microservice running type is: ${chalk.green('node')}.`);
 
-  childProcess.execSync(`cd ${getMsFolder()}/authorization && npm run ${npmCommand}`, { stdio: 'inherit' });
+  childProcess.execSync(`cd ${getMsFolder()}/authorization && npm run ${npmCommand}:${isProd ? 'prod' : 'dev'}`, { stdio: 'inherit' });
 }
 
 program
