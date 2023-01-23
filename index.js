@@ -17,7 +17,7 @@ const program = new Command();
  */
 const getFilteredMsNames = () => {
   const options = program.opts();
-  return process.env.ONLY || options.only;
+  return process.env.ONLY || options.only || '';
 }
 
 /**
