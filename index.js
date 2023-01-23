@@ -375,10 +375,24 @@ const runLint = (shouldFix = false) => {
 /**
  * Create microservice feature
  */
-const runChangeFeature = (name, feature, action, isStaging) => {
+const runChangeFeature = async (name, action, isStaging) => {
   const msPath = `${getMsFolder()}/${name}`;
   const msSrcPath = `${getMsFolder()}/${name}/src`;
   // const tempPath = `${getMsFolder()}/${name}/temp`;
+
+  const { feature } = await inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'feature',
+        message: 'Please choose feature: ',
+        choices: ['none', 'db'],
+      },
+    ]);
+
+  if (feature === 'none') {
+    return;
+  }
 
   if (!fs.existsSync(msPath)) {
     console.log(`Microservice "${chalk.red(name)}" not exist!`);
@@ -721,11 +735,10 @@ program.command('create')
 program.command('feature')
   .description('Add or remove some microservice features like support DB etc.')
   .addArgument(new Argument('<name>', 'microservice name'))
-  .addArgument(new Argument('<feature>', 'feature name').choices(['db']))
   .addArgument(new Argument('<action>', 'action name').choices(['add', 'remove']))
   .option('--staging', 'use staging configuration', false)
-  .action((name, feature, action, { staging }) => {
-    runChangeFeature(name, feature, action, staging);
+  .action((name, action, { staging }) => {
+    runChangeFeature(name, action, staging);
   });
 
 program.command('extend')
