@@ -475,7 +475,7 @@ const runCreateMicroservice = async (name, isStaging, withDb) => {
 /**
  * Create extended microservice
  */
-const runExtendMicroservice = async (name, type, isStaging) => {
+const runExtendMicroservice = async (name, isStaging) => {
   const msFolder = getMsFolder();
   const msPath = `${msFolder}/${name}`;
   const msSrcPath = `${msFolder}/${name}/src`;
@@ -487,6 +487,16 @@ const runExtendMicroservice = async (name, type, isStaging) => {
 
     return;
   }
+
+  const { type } = await inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'action',
+        message: 'Please choose type: ',
+        choices: ['docker', 'package'],
+      },
+    ]);
 
   console.info(`Prepare to extend microservice: ${chalk.green(name)}.`)
   isStaging && console.info(chalk.yellow('Staging mode'));
@@ -810,11 +820,10 @@ program.command('feature')
 
 program.command('extend')
   .description('Create extended microservice')
-  .addArgument(new Argument('<name>', 'microservice name').choices(['authorization', 'users']))
-  .addArgument(new Argument('<type>', 'extend type').choices(['docker', 'package']))
+  .addArgument(new Argument('<name>', 'microservice name, e.g authorization, users etc.'))
   .option('--staging', 'use staging configuration', false)
-  .action((name, type, { staging }) => {
-    void runExtendMicroservice(name, type, staging);
+  .action((name, { staging }) => {
+    void runExtendMicroservice(name, staging);
   });
 
 program.command('changed-microservices')
