@@ -492,7 +492,7 @@ const runExtendMicroservice = async (name, isStaging) => {
     .prompt([
       {
         type: 'list',
-        name: 'action',
+        name: 'type',
         message: 'Please choose type: ',
         choices: ['docker', 'package'],
       },
@@ -554,6 +554,7 @@ const runExtendMicroservice = async (name, isStaging) => {
 
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/constants/index.ts`);
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/config/start.ts`);
+      replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/package.json`);
 
       childProcess.execSync(`cd ${msPath} && npm i --save require-in-the-middle`, {
         stdio: 'inherit',
