@@ -509,6 +509,9 @@ const runExtendMicroservice = async (name, type, isStaging) => {
         // copy default permissions
         fse.copySync(`${tempPath}/microservices/authorization/migrations/permissions/list`, `${msPath}/permissions`, {});
 
+        replaceStrInFile('#volumes', 'volumes', 'docker-compose.ms.yml');
+        replaceStrInFile('#  -', '  -', 'docker-compose.ms.yml');
+
         // docker file should include our permission when build
         fs.appendFileSync(`${msPath}/Dockerfile`, 'COPY ./permissions $WEB_PATH/lib/migrations/permissions/list\n');
         fs.appendFileSync(`${msPath}/Dockerfile`, 'COPY ./lib/package.json.js $WEB_PATH/lib/package.json.js\n');
@@ -627,12 +630,10 @@ const runInitProject = async (name, isStaging) => {
   fse.ensureDirSync(`${root}/microservices`, {});
   fse.removeSync(tempPath);
 
-  replaceStrInFile('@lomray/microservices', appName, `${root}/package.json`);
+  replaceStrInFile('"@lomray/microservices"', `"${appName}"`, `${root}/package.json`);
   replaceStrInFile('https://github.com/Lomray-Software/microservices', '', `${root}/package.json`);
-  replaceStrInFile('@lomray/microservices', appName, `${root}/package-lock.json`);
+  replaceStrInFile('"@lomray/microservices"', `"${appName}"`, `${root}/package-lock.json`);
   replaceStrInFile('Lomray-Software/microservices', repoName, `${root}/.github/workflows/build.yml`);
-  replaceStrInFile('#volumes', 'volumes', `${root}/docker-compose.ms.yml`);
-  replaceStrInFile('#  -', '  -', `${root}/docker-compose.ms.yml`);
 
   childProcess.execSync(`cd ${root} && npm ci --ignore-scripts`, { stdio: 'inherit' });
 
