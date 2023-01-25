@@ -553,7 +553,7 @@ const runExtendMicroservice = async (name, isStaging) => {
     case 'package':
       fse.copySync(`${tempPath}/template/new/__helpers__`, `${msPath}/__helpers__`, {});
       fse.copySync(`${tempPath}/template/new/__tests__/index-test.ts`, `${msPath}/__tests__/index-test.ts`, {});
-      fse.copySync(`${tempPath}/template/package`, msPath, {});
+      fse.copySync(`${tempPath}/template/package`, msPath, { overwrite: true });
       fse.copySync(`${targetMsPath}/src/index.ts`, `${msPath}/src/index.ts`, {});
       fse.copySync(`${targetMsPath}/src/tracer.ts`, `${msPath}/src/tracer.ts`, {});
 
