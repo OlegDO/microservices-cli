@@ -415,16 +415,8 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
       case 'db':
         if (action === 'add') {
           replaceStrInFile('withDb: false', 'withDb: true', `${msSrcPath}/constants/index.ts`);
-          replaceStrInFile('// dbOptions:', 'dbOptions:', `${msSrcPath}/config/start.ts`);
-          replaceStrInFile('// GetDbConfig,', 'GetDbConfig,', `${msSrcPath}/config/start.ts`);
-          replaceStrInFile('start }', 'startWithDb }', `${msSrcPath}/index.ts`);
-          replaceStrInFile('default start', 'default startWithDb', `${msSrcPath}/index.ts`);
         } else {
           replaceStrInFile('withDb: true', 'withDb: false', `${msSrcPath}/constants/index.ts`);
-          replaceStrInFile('dbOptions:', '// dbOptions:', `${msSrcPath}/config/start.ts`);
-          replaceStrInFile('GetDbConfig,', '// GetDbConfig,', `${msSrcPath}/config/start.ts`);
-          replaceStrInFile('startWithDb }', 'start }', `${msSrcPath}/index.ts`);
-          replaceStrInFile('default startWithDb', 'default start', `${msSrcPath}/index.ts`);
         }
         break;
     }
