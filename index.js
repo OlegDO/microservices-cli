@@ -375,20 +375,25 @@ const runLint = (shouldFix = false) => {
 /**
  * Create microservice feature
  */
-const runChangeFeature = async (name, action, isStaging) => {
+const runChangeFeature = async (name, action, { feat, isStaging }) => {
   const msPath = `${getMsFolder()}/${name}`;
   const msSrcPath = `${getMsFolder()}/${name}/src`;
   // const tempPath = `${getMsFolder()}/${name}/temp`;
 
-  const { feature } = await inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'feature',
-        message: 'Please choose feature: ',
-        choices: ['none', 'db'],
-      },
-    ]);
+  let feature = feat;
+
+  if (!feature) {
+    const prompt = await inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'answer',
+          message: 'Please choose feature: ',
+          choices: ['none', 'db'],
+        },
+      ]);
+    feature = prompt.answer;
+  }
 
   if (feature === 'none') {
     return;
@@ -463,7 +468,7 @@ const runCreateMicroservice = async (name, isStaging, withDb) => {
   replaceStrInFile('microservice-name', name, `${msPath}/README.md`);
 
   if (withDb) {
-    await runChangeFeature('db', 'add', isStaging);
+    await runChangeFeature(name, 'add', { isStaging, feat: 'db' });
   }
 
   fse.removeSync(tempPath);
@@ -584,6 +589,7 @@ const runInitProject = async (name, isStaging) => {
     return;
   }
 
+  // noinspection JSUnusedGlobalSymbols
   const { repoName } = await inquirer
     .prompt([
       {
@@ -655,9 +661,9 @@ const runInitProject = async (name, isStaging) => {
  * Working with authorization permissions
  */
 const runAuthorizationPermissions = async (act, isProd) => {
-  let promptAction = '';
+  let action = act;
 
-  if (!act) {
+  if (!action) {
     const prompt = await inquirer
       .prompt([
         {
@@ -668,10 +674,9 @@ const runAuthorizationPermissions = async (act, isProd) => {
         },
       ]);
 
-    promptAction = prompt.action;
+    action = prompt.action;
   }
 
-  const action = act || promptAction;
   let npmCommand;
 
   switch (action) {
@@ -816,7 +821,7 @@ program.command('feature')
   .addArgument(new Argument('<action>', 'action name').choices(['add', 'remove']))
   .option('--staging', 'use staging configuration', false)
   .action((name, action, { staging }) => {
-    void runChangeFeature(name, action, staging);
+    void runChangeFeature(name, action, { isStaging: staging });
   });
 
 program.command('extend')
