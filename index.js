@@ -69,6 +69,23 @@ const downloadRepo = async (path, isStaging) => {
 }
 
 /**
+ * Add new line to end of file
+ */
+const appendLineToFile = (filePath, line) => {
+  fs.appendFileSync(filePath, `${line}\n`);
+}
+
+/**
+ * Add new line to begin of file
+ */
+const prependLineToFile = (filePath, line) => {
+  const data = fs
+    .readFileSync(filePath, { encoding: 'utf-8' })
+
+  fs.writeFileSync(filePath, `${line}\n${data}`, { encoding: 'utf-8' });
+}
+
+/**
  * Get microservices list
  */
 const getMicroservices = (withDir, checkJson) => {
@@ -520,8 +537,8 @@ const runExtendMicroservice = async (name, isStaging) => {
         replaceStrInFile('#  -', '  -', 'docker-compose.ms.yml');
 
         // docker file should include our permission when build
-        fs.appendFileSync(`${msPath}/Dockerfile`, 'COPY ./permissions $WEB_PATH/lib/migrations/permissions/list\n');
-        fs.appendFileSync(`${msPath}/Dockerfile`, 'COPY ./lib/package.json.js $WEB_PATH/lib/package.json.js\n');
+        appendLineToFile(`${msPath}/Dockerfile`, 'COPY ./permissions $WEB_PATH/lib/migrations/permissions/list');
+        appendLineToFile(`${msPath}/Dockerfile`, 'COPY ./lib/package.json.js $WEB_PATH/lib/package.json.js');
       } else {
         replaceStrInFile('authorization', name, `${msPath}/Dockerfile`);
         replaceStrInFile('authorization', name, `${msPath}/package.json`);
@@ -550,6 +567,7 @@ const runExtendMicroservice = async (name, isStaging) => {
         }
       });
 
+      prependLineToFile(`${msPath}/src/index.ts`, "import '@config/di';");
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/constants/index.ts`);
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/config/start.ts`);
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/package.json`);
