@@ -546,6 +546,7 @@ const runExtendMicroservice = async (name, isStaging) => {
       fse.copySync(`${tempPath}/template/new/__tests__/index-test.ts`, `${msPath}/__tests__/index-test.ts`, {});
       fse.copySync(`${tempPath}/template/package`, msPath, {});
       fse.copySync(`${targetMsPath}/src/index.ts`, `${msPath}/src/index.ts`, {});
+      fse.copySync(`${targetMsPath}/src/tracer.ts`, `${msPath}/src/tracer.ts`, {});
 
       const files = fs.readdirSync(`${tempPath}/template/new`);
 
