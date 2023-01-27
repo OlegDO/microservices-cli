@@ -542,7 +542,8 @@ const runExtendMicroservice = async (name, isStaging) => {
       } else {
         replaceStrInFile('authorization', name, `${msPath}/Dockerfile`);
         replaceStrInFile('authorization', name, `${msPath}/package.json`);
-        replaceStrInFile('sync:permissions', 'lint:format', `${msPath}/package.json`);
+        replaceStrInFile('node lib/migrations/permissions/export.js', '', `${msPath}/package.json`);
+        replaceStrInFile('node lib/migrations/permissions/import.js', '', `${msPath}/package.json`);
         replaceStrInFile('node lib/migrations/permissions/sync.js', '', `${msPath}/package.json`);
         replaceStrInFile('authorization', name, `${msPath}/package-lock.json`);
         replaceStrInFile('authorization', name, `${msPath}/README.md`);
