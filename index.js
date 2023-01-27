@@ -695,6 +695,10 @@ const runAuthorizationPermissions = async (act, isProd) => {
       npmCommand = 'permissions:export';
       break;
 
+    case 'import':
+      npmCommand = 'permissions:import';
+      break;
+
     case 'sync':
       npmCommand = 'permissions:sync';
       break;
