@@ -395,7 +395,7 @@ const runLint = (shouldFix = false) => {
 const runChangeFeature = async (name, action, { feat, isStaging }) => {
   const msPath = `${getMsFolder()}/${name}`;
   const msSrcPath = `${getMsFolder()}/${name}/src`;
-  // const tempPath = `${getMsFolder()}/${name}/temp`;
+  const tempPath = `${getMsFolder()}/${name}/temp`;
 
   let feature = feat;
 
@@ -406,7 +406,7 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
           type: 'list',
           name: 'answer',
           message: 'Please choose feature: ',
-          choices: ['none', 'db'],
+          choices: ['none', 'db', 'remote-config'],
         },
       ]);
     feature = prompt.answer;
@@ -436,6 +436,18 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
           replaceStrInFile('withDb: true', 'withDb: false', `${msSrcPath}/constants/index.ts`);
         }
         break;
+
+      case 'remote-config':
+        await downloadRepo(tempPath, isStaging);
+
+        if (action === 'add') {
+          fse.copySync(`${tempPath}/template/features/remote-config`, msPath, {});
+        } else {
+          fse.removeSync(`${msPath}/config/remote.ts`);
+          fse.removeSync(`${msPath}/interfaces/remote-config.ts`);
+        }
+
+        break;
     }
   } catch (e) {
     console.log(`Failed ${action} feature ${chalk.red(feature)}: ${e.message}`);
@@ -462,7 +474,7 @@ const runCreateMicroservice = async (name, isStaging, withDb) => {
   console.log(`Creating new microservice: ${chalk.green(name)}`);
   isStaging && console.info(chalk.yellow('Staging mode'));
 
-  await downloadRepo(tempPath, isStaging)
+  await downloadRepo(tempPath, isStaging);
 
   fse.copySync(`${tempPath}/template/new`, msPath, {});
 
