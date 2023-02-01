@@ -194,6 +194,19 @@ const runOutputChangedMicroservices = (filesStr) => {
 }
 
 /**
+ * Detect right docker file for microservice
+ */
+const runDetectDockerfile = (workdir) => {
+  const dockerfile = 'Dockerfile-nodejs';
+  const workdirDockerfile = [workdir, 'Dockerfile'].join('/');
+  const path = fs.existsSync(workdirDockerfile) ? workdirDockerfile : dockerfile;
+
+  console.log(`Dockerfile path: ${chalk.green(path)}`);
+
+  github.setOutput('path', dockerfile);
+}
+
+/**
  * Get package version from package.json
  * NOTE: used in CI/CD
  */
@@ -865,6 +878,13 @@ program.command('changed-microservices')
   .addOption(new Option('--files [files]', 'changed files in json format').env('FILES'))
   .action(({ files }) => {
     void runOutputChangedMicroservices(files);
+  });
+
+program.command('detect-docker-file')
+  .description('Detect microservice docker file')
+  .addOption(new Option('--workdir [files]', 'working directory e.g. "microservices/authorization"').env('WORK_DIR'))
+  .action((workdir) => {
+    void runDetectDockerfile(workdir);
   });
 
 program.command('package-version')
