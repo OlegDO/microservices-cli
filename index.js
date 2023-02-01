@@ -132,12 +132,13 @@ const replaceStrInFile = (subj, replaceValue, file) => {
  * Try to find file in sequence
  */
 const findFile = (fileNames = [], folder) => {
-  fileNames.forEach((fileName) => {
+  for (const fileName of fileNames) {
     const file = folder ? `${folder}/${fileName}` : fileName;
+
     if (fs.existsSync(file)) {
       return file;
     }
-  });
+  }
 
   return null;
 }
@@ -231,7 +232,7 @@ const runOutputPackageVersion = (workDir = '.') => {
  * Update .env file
  */
 const runUpdateDotenv = (env) => {
-  const folder = './configs';
+  const folder = 'configs';
   const middlewaresFile = findFile([`middlewares.${env}.json`, 'middlewares.json'], folder);
   const configFile = findFile([`config.${env}.json`, 'config.local.json', 'config.json'], folder);
   const dotenvFile = getEnvPath();
