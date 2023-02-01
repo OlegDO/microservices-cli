@@ -203,7 +203,7 @@ const runDetectDockerfile = (workdir) => {
 
   console.log(`Dockerfile path: ${chalk.green(path)}`);
 
-  github.setOutput('path', dockerfile);
+  github.setOutput('path', path);
 }
 
 /**
@@ -883,7 +883,7 @@ program.command('changed-microservices')
 program.command('detect-docker-file')
   .description('Detect microservice docker file')
   .addOption(new Option('--workdir [files]', 'working directory e.g. "microservices/authorization"').env('WORK_DIR'))
-  .action((workdir) => {
+  .action(({ workdir }) => {
     void runDetectDockerfile(workdir);
   });
 
