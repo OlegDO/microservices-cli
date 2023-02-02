@@ -708,7 +708,7 @@ const runAuthorizationPermissions = async (act, isProd) => {
           type: 'list',
           name: 'action',
           message: 'Please choose feature: ',
-          choices: ['export', 'sync'],
+          choices: ['sync', 'export', 'import'],
         },
       ]);
 
@@ -897,7 +897,7 @@ program.command('package-version')
 
 program.command('permissions')
   .description('Working with permissions in authorization microservice')
-  .addArgument(new Argument('[action]', 'permissions action. export - dump from DB to files, sync - get microservices meta and update in schema DB').choices(['export', 'sync']))
+  .addArgument(new Argument('[action]', 'permissions action. export - dump from DB to files, sync - get microservices meta and update in schema DB').choices(['sync', 'export', 'import']))
   .option('--is-prod', 'run command in production', false)
   .action((action, { isProd }) => {
     void runAuthorizationPermissions(action, isProd);
