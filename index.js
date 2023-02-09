@@ -404,7 +404,58 @@ const runLint = (shouldFix = false) => {
 };
 
 /**
- * Create microservice feature
+ * Create/remove global feature
+ */
+const runChangeGlobalFeature = async (action, { isStaging }) => {
+  const rootPath = path.resolve(`../${getMsFolder()}`);
+  const tempPath = `${rootPath}/temp`;
+
+  const { feature } = await inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'feature',
+        message: 'Please choose feature: ',
+        choices: ['none', 'integration tests'],
+      },
+    ]);
+
+  if (feature === 'none') {
+    return;
+  }
+
+  console.info(`Prepare to change global feature ${chalk.yellow(feature)}`);
+  isStaging && console.info(chalk.yellow('Staging mode'));
+
+  try {
+    await downloadRepo(tempPath, isStaging);
+
+    switch (feature) {
+      case 'integration tests':
+        if (action === 'add') {
+          const destPath = `${rootPath}/tests`;
+
+          if (!fs.existsSync(destPath)) {
+            fse.copySync(`${tempPath}/tests`, rootPath, {});
+          } else {
+            console.log(`Global feature ${chalk.red(feature)} already exist.`);
+          }
+        } else {
+          fse.removeSync(`${rootPath}/tests`);
+        }
+        break;
+    }
+  } catch (e) {
+    console.log(`Failed ${action} global feature ${chalk.red(feature)}`);
+
+    return;
+  }
+
+  console.info(`Feature ${chalk.yellow(action)} success: ${chalk.green(feature)}`);
+}
+
+/**
+ * Create/remove microservice feature
  */
 const runChangeFeature = async (name, action, { feat, isStaging }) => {
   const msPath = `${getMsFolder()}/${name}`;
@@ -455,7 +506,13 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
         await downloadRepo(tempPath, isStaging);
 
         if (action === 'add') {
-          fse.copySync(`${tempPath}/template/features/remote-config`, msPath, {});
+          const destPath = `${msPath}/template/features/remote-config`;
+
+          if (!fs.existsSync(destPath)) {
+            fse.copySync(`${tempPath}/template/features/remote-config`, msPath, {});
+          } else {
+            console.log(`Feature ${chalk.red(feature)} already exist.`);
+          }
         } else {
           fse.removeSync(`${msPath}/config/remote.ts`);
           fse.removeSync(`${msPath}/interfaces/remote-config.ts`);
@@ -864,6 +921,14 @@ program.command('feature')
   .option('--staging', 'use staging configuration', false)
   .action((name, action, { staging }) => {
     void runChangeFeature(name, action, { isStaging: staging });
+  });
+
+program.command('global-feature')
+  .description('Add or remove global features like integration tests etc.')
+  .addArgument(new Argument('<action>', 'action name').choices(['add', 'remove']))
+  .option('--staging', 'use staging configuration', false)
+  .action((action, { staging }) => {
+    void runChangeGlobalFeature(action, { isStaging: staging });
   });
 
 program.command('extend')
