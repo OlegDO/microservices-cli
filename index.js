@@ -234,6 +234,7 @@ const runOutputPackageVersion = (workDir = '.') => {
 const runUpdateDotenv = (env) => {
   const folder = 'configs';
   const middlewaresFile = findFile([`middlewares.${env}.json`, 'middlewares.json'], folder);
+  const cronFile = findFile([`cron.${env}.json`, 'cron.json'], folder);
   const configFile = findFile([`config.${env}.json`, 'config.local.json', 'config.json'], folder);
   const dotenvFile = getEnvPath();
 
@@ -247,6 +248,14 @@ const runUpdateDotenv = (env) => {
     return;
   }
 
+  let cronTasks = '[]';
+
+  if (cronFile) {
+    cronTasks = JSON.stringify(
+      JSON.parse(fs.readFileSync(cronFile, { encoding: 'utf8' })),
+    );
+  }
+
   const middlewares = JSON.stringify(
     JSON.parse(fs.readFileSync(middlewaresFile, { encoding: 'utf8' })),
   );
@@ -254,7 +263,8 @@ const runUpdateDotenv = (env) => {
   const dotenv = fs
     .readFileSync(dotenvFile, { encoding: 'utf8' })
     .replace(/MS_INIT_MIDDLEWARES=.*/, `MS_INIT_MIDDLEWARES='${middlewares}'`)
-    .replace(/MS_INIT_CONFIGS=.*/, `MS_INIT_CONFIGS='${configs}'`);
+    .replace(/MS_INIT_CONFIGS=.*/, `MS_INIT_CONFIGS='${configs}'`)
+    .replace(/MS_INIT_TASKS=.*/, `MS_INIT_TASKS='${cronTasks}'`);
 
   fs.writeFileSync(dotenvFile, dotenv, 'utf8');
 };
