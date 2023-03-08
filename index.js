@@ -519,13 +519,13 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
           const destPath = `${msPath}/template/features/remote-config`;
 
           if (!fs.existsSync(destPath)) {
-            fse.copySync(`${tempPath}/template/features/remote-config`, msPath, {});
+            fse.copySync(`${tempPath}/template/features/remote-config`, msSrcPath, {});
           } else {
             console.log(`Feature ${chalk.red(feature)} already exist.`);
           }
         } else {
-          fse.removeSync(`${msPath}/config/remote.ts`);
-          fse.removeSync(`${msPath}/interfaces/remote-config.ts`);
+          fse.removeSync(`${msSrcPath}/config/remote.ts`);
+          fse.removeSync(`${msSrcPath}/interfaces/remote-config.ts`);
         }
 
         break;
