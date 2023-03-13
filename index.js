@@ -534,6 +534,8 @@ const runChangeFeature = async (name, action, { feat, isStaging }) => {
     console.log(`Failed ${action} feature ${chalk.red(feature)}: ${e.message}`);
 
     return;
+  } finally {
+    fse.removeSync(tempPath);
   }
 
   console.info(`Feature ${chalk.yellow(action)} success: ${chalk.green(feature)}`);
