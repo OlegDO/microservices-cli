@@ -587,8 +587,8 @@ const runCreateMicroservice = async (name, isStaging, withDb) => {
 const runExtendMicroservice = async (name, isStaging) => {
   const msFolder = getMsFolder();
   const msPath = `${msFolder}/${name}`;
-  const msSrcPath = `${msFolder}/${name}/src`;
-  const tempPath = `${msFolder}/${name}/temp`;
+  const msSrcPath = `${msPath}/src`;
+  const tempPath = `${msPath}/temp`;
   const targetMsPath = `${tempPath}/microservices/${name}`;
 
   if (fs.existsSync(msPath)) {
@@ -603,7 +603,7 @@ const runExtendMicroservice = async (name, isStaging) => {
         type: 'list',
         name: 'type',
         message: 'Please choose type: ',
-        choices: ['docker', 'package'],
+        choices: ['package', 'docker'],
       },
     ]);
 
@@ -666,7 +666,7 @@ const runExtendMicroservice = async (name, isStaging) => {
       prependLineToFile(`${msPath}/src/index.ts`, "import '@config/di';");
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/constants/index.ts`);
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/config/start.ts`);
-      replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/package.json`);
+      replaceStrInFile('microservice-name', `microservice-${name}`, `${msPath}/package.json`);
 
       childProcess.execSync(`cd ${msPath} && npm i --save require-in-the-middle`, {
         stdio: 'inherit',
