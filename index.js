@@ -7,7 +7,7 @@ const chalk = require('chalk');
 const { Command, Option, Argument } = require('commander');
 const inquirer = require('inquirer');
 const github = require('@actions/core');
-const getRepository = require('get-repository');
+const getRepository = require('./get-repository');
 const packageJson = require('./package.json');
 
 const program = new Command();
