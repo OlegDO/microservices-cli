@@ -7,7 +7,7 @@ const chalk = require('chalk');
 const { Command, Option, Argument } = require('commander');
 const inquirer = require('inquirer');
 const github = require('@actions/core');
-const GhDownload = require('github-download');
+const getRepository = require('get-repository');
 const packageJson = require('./package.json');
 
 const program = new Command();
@@ -50,15 +50,7 @@ const downloadRepo = async (path, isStaging) => {
   try {
     fse.ensureDirSync(path, {});
 
-    await new Promise((resolve, reject) => {
-      GhDownload(getGithubParams(isStaging), path)
-        .on('end', () => {
-          resolve(true);
-        })
-        .on('error', (err) => {
-          reject(err);
-        });
-    });
+    await getRepository(getGithubParams(isStaging), path);
   } catch (err) {
     console.info(chalk.red(`Failed to download configuration: ${err.message}`));
 
