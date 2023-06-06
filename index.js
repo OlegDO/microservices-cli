@@ -276,7 +276,10 @@ const runGlobalInstall = (command = 'i') => {
       continue;
     }
 
-    childProcess.execSync(`cd ${msDir} && npm ${command}`, { stdio: 'inherit' });
+    childProcess.execSync(`npm ${command}`, {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     console.info(`Install done: ${msDir}`);
   }
@@ -305,7 +308,10 @@ const runGlobalUpdate = (packageName, version = null) => {
       );
     }
 
-    childProcess.execSync(`cd ${msDir} && npm update ${packageName}`, { stdio: 'inherit' });
+    childProcess.execSync(`npm update ${packageName}`, {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     console.info(`Package updated for: ${msDir}`);
   }
@@ -318,12 +324,18 @@ const runSemanticRelease = (isDryRun = false) => {
   const microservices = getMicroservices(true, true);
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && npx semantic-release ${isDryRun ? '--dryRun' : ''}`, {
+    console.info(chalk.blue(`Begin release: ${msDir}`));
+
+    childProcess.execSync(`npx semantic-release ${isDryRun ? '--dryRun' : ''}`, {
       stdio: 'inherit',
-      env: { ...process.env },
+      cwd: msDir,
+      env: {
+        ...process.env,
+        SEMANTIC_WORKING_DIR: msDir,
+      },
     });
 
-    console.info(`Semantic release done: ${msDir}`);
+    console.info(chalk.green(`Semantic release done: ${msDir}`));
   }
 };
 
@@ -334,7 +346,10 @@ const runLintStaged = () => {
   const microservices = getMicroservices(true, true);
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && npx lint-staged`, { stdio: 'inherit' });
+    childProcess.execSync('npx lint-staged', {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     console.info(`Lint staged done: ${msDir}`);
   }
@@ -347,7 +362,10 @@ const runBuild = () => {
   const microservices = getMicroservices(true, true);
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && npm run build`, { stdio: 'inherit' });
+    childProcess.execSync('npm run build', {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     const packageJsonJs = `${msDir}/lib/package.json.js`;
 
@@ -370,8 +388,9 @@ const runTests = (withCoverage = false) => {
   const microservices = getMicroservices(true, true);
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && ${withCoverage ? 'nyc' : ''} npm run test`, {
+    childProcess.execSync(`${withCoverage ? 'nyc' : ''} npm run test`, {
       stdio: 'inherit',
+      cwd: msDir,
     });
 
     console.info(`Tests done: ${msDir}`);
@@ -385,7 +404,10 @@ const runCheckTypescript = () => {
   const microservices = getMicroservices(true, true);
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && npm run ts:check`, { stdio: 'inherit' });
+    childProcess.execSync('npm run ts:check', {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     console.info(`Typescript check done: ${msDir}`);
   }
@@ -418,7 +440,10 @@ const runLint = (shouldFix = false) => {
   const action = shouldFix ? 'fix' : 'check'
 
   for (const msDir of microservices) {
-    childProcess.execSync(`cd ${msDir} && npm run lint:${action}`, { stdio: 'inherit' });
+    childProcess.execSync(`npm run lint:${action}`, {
+      stdio: 'inherit',
+      cwd: msDir,
+    });
 
     console.info(`Lint check done: ${msDir}`);
   }
@@ -679,11 +704,13 @@ const runExtendMicroservice = async (name, isStaging) => {
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msSrcPath}/config/start.ts`);
       replaceStrInFile('microservice-name', `microservice-${name}`, `${msPath}/package.json`);
 
-      childProcess.execSync(`cd ${msPath} && npm i --save require-in-the-middle`, {
+      childProcess.execSync('npm i --save require-in-the-middle', {
         stdio: 'inherit',
+        cwd: msPath,
       });
-      childProcess.execSync(`cd ${msPath} && npm i --save @lomray/microservice-${name}`, {
+      childProcess.execSync(`npm i --save @lomray/microservice-${name}`, {
         stdio: 'inherit',
+        cwd: msPath,
       });
 
       break;
@@ -770,7 +797,10 @@ const runInitProject = async (name, isStaging) => {
   replaceStrInFile('"@lomray/microservices"', `"${appName}"`, `${root}/package-lock.json`);
   replaceStrInFile('Lomray-Software/microservices', repoName, `${root}/.github/workflows/build.yml`);
 
-  childProcess.execSync(`cd ${root} && npm ci --ignore-scripts`, { stdio: 'inherit' });
+  childProcess.execSync('npm ci --ignore-scripts', {
+    stdio: 'inherit',
+    cwd: root,
+  });
 
   console.info(chalk.green('Done!'));
 }
@@ -841,7 +871,10 @@ const runAuthorizationPermissions = async (act, isProd) => {
 
   console.log(`Seems like microservice running type is: ${chalk.green('node')}.`);
 
-  childProcess.execSync(`cd ${getMsFolder()}/authorization && npm run ${npmCommand}:${isProd ? 'prod' : 'dev'}`, { stdio: 'inherit' });
+  childProcess.execSync(`npm run ${npmCommand}:${isProd ? 'prod' : 'dev'}`, {
+    stdio: 'inherit',
+    cwd: `${getMsFolder()}/authorization`,
+  });
 }
 
 program
