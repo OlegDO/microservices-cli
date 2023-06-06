@@ -392,6 +392,25 @@ const runCheckTypescript = () => {
 };
 
 /**
+ * Patch package version
+ */
+const runPatchPackageVersion = (workDir = '.', version = '1.0.0') => {
+  for (const file of ['package.json', 'lib/package.json', 'lib/package.json.js']) {
+    const filePath = path.resolve(`${workDir}/${file}`);
+
+    if (!fs.existsSync(filePath)) {
+      console.info(chalk.yellow('Skip file:'), filePath);
+
+      continue;
+    }
+
+    replaceStrInFile('(version.+)("1.0.0")', `$1"${version}"`, filePath);
+
+    console.info(chalk.green('Patched file:'), filePath);
+  }
+};
+
+/**
  * Run lint for each microservice
  */
 const runLint = (shouldFix = false) => {
@@ -962,6 +981,14 @@ program.command('package-version')
   .addOption(new Option('--dir [dir]', 'working directory').env('WORK_DIR'))
   .action(({ dir }) => {
     void runOutputPackageVersion(dir);
+  });
+
+program.command('patch-package-version')
+  .description('Update package version')
+  .addOption(new Option('--dir [dir]', 'working directory').env('WORK_DIR'))
+  .addOption(new Option('--version [version]', 'new version').env('PACKAGE_VERSION'))
+  .action(({ dir, version }) => {
+    void runPatchPackageVersion(dir, version);
   });
 
 program.command('permissions')
