@@ -986,9 +986,9 @@ program.command('package-version')
 program.command('patch-package-version')
   .description('Update package version')
   .addOption(new Option('--dir [dir]', 'working directory').env('WORK_DIR'))
-  .addOption(new Option('--package-version [version]', 'new package version').env('PACKAGE_VERSION'))
-  .action(({ dir, version }) => {
-    void runPatchPackageVersion(dir, version);
+  .addOption(new Option('--package-version [packageVersion]', 'new package version').env('PACKAGE_VERSION'))
+  .action(({ dir, packageVersion }) => {
+    void runPatchPackageVersion(dir, packageVersion);
   });
 
 program.command('permissions')
