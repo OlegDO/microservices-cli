@@ -322,6 +322,7 @@ const runGlobalUpdate = (packageName, version = null) => {
  */
 const runSemanticRelease = (isDryRun = false) => {
   const microservices = getMicroservices(true, true);
+  const rootDir = process.cwd();
 
   for (const msDir of microservices) {
     console.info(chalk.blue(`Begin release: ${msDir}`));
@@ -332,6 +333,7 @@ const runSemanticRelease = (isDryRun = false) => {
       env: {
         ...process.env,
         SEMANTIC_WORKING_DIR: msDir,
+        SEMANTIC_ROOT_DIR: rootDir,
       },
     });
 
@@ -416,19 +418,23 @@ const runCheckTypescript = () => {
 /**
  * Patch package version
  */
-const runPatchPackageVersion = (workDir = '.', version = '1.0.0') => {
+const runPatchPackageVersion = (workDir = '.', version = '1.0.0', isSilent = false) => {
   for (const file of ['package.json', 'lib/package.json', 'lib/package.json.js']) {
     const filePath = path.resolve(`${workDir}/${file}`);
 
     if (!fs.existsSync(filePath)) {
-      console.info(chalk.yellow('Skip file:'), filePath);
+      if (!isSilent) {
+        console.info(chalk.yellow('Skip file:'), filePath);
+      }
 
       continue;
     }
 
     replaceStrInFile('(version.+)("1.0.0")', `$1"${version}"`, filePath);
 
-    console.info(chalk.green('Patched file:'), filePath);
+    if (!isSilent) {
+      console.info(chalk.green('Patched file:'), filePath);
+    }
   }
 };
 
@@ -1020,8 +1026,9 @@ program.command('patch-package-version')
   .description('Update package version')
   .addOption(new Option('--dir [dir]', 'working directory').env('WORK_DIR'))
   .addOption(new Option('--package-version [packageVersion]', 'new package version').env('PACKAGE_VERSION'))
-  .action(({ dir, packageVersion }) => {
-    void runPatchPackageVersion(dir, packageVersion);
+  .option('--is-silent', 'run command without output', false)
+  .action(({ dir, packageVersion, isSilent }) => {
+    void runPatchPackageVersion(dir, packageVersion, isSilent);
   });
 
 program.command('permissions')
