@@ -9,7 +9,7 @@ import { program } from '../command.js';
  * Get package version from package.json
  * NOTE: used in CI/CD
  */
-const runOutputPackageVersion = (workDir = '.') => {
+const runOutputPackageVersion = async (workDir = '.') => {
   const packageJson = path.resolve(`${workDir}/package.json`);
 
   if (!fs.existsSync(packageJson)) {
@@ -20,7 +20,7 @@ const runOutputPackageVersion = (workDir = '.') => {
     return github.setFailed(`Action failed with error ${error}`);
   }
 
-  const version = require(packageJson).version;
+  const { version } = (await import(packageJson, { assert: { type: 'json' } })).default;
 
   console.log(`Version package: ${chalk.green(version)}`);
   github.setOutput('version', version);
