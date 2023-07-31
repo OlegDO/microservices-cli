@@ -1,7 +1,7 @@
-const http = require('https');
-const unzip = require('unzipper');
-const path = require('path');
-const fse = require('fs-extra')
+import http from 'node:https';
+import path from 'node:path';
+import fse from 'fs-extra';
+import unzip from 'unzipper';
 
 /**
  * Download repository
@@ -51,4 +51,4 @@ const getRepository = (params, dest) => {
   })
 }
 
-module.exports = getRepository;
+export default getRepository;
