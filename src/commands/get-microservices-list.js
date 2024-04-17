@@ -25,7 +25,7 @@ const getMicroservicesList = () => {
  * Add command to CLI
  */
 program.command('microservices-list')
-  .description('Returns microservices list based on folders in microservices folder')
+  .description('Returns microservices list based on folders')
   .action(() => {
     void getMicroservicesList();
   });
