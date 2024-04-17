@@ -15,7 +15,6 @@ const getMicroservicesList = () => {
 
   console.log(`Microservices list: ${chalk.green(output1)}`);
 
-  console.log(output1, output2)
   // output example: ["demo1","demo2","demo3"]
   github.setOutput('list', output1);
   // output example: "demo1 demo2 demo3"
