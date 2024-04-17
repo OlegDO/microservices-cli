@@ -21,5 +21,6 @@ import './src/commands/semantic-release.js';
 import './src/commands/test.js';
 import './src/commands/ts-check.js';
 import './src/commands/update-env.js';
+import './src/commands/get-microservices-list.js'
 
 program.parse();
